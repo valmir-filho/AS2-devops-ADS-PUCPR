@@ -36,7 +36,7 @@ jobs:
       docker:
         image: docker:dind
     steps:
-      - name: Checkout do repositorio
+      - name: Checkout repository
         uses: actions/checkout@v2
       - name: Build and Push Docker image
         env:
@@ -47,6 +47,13 @@ jobs:
           docker tag atividadesomativa2 vmcfilho/atividadesomativa2:latest
           echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
           docker push vmcfilho/atividadesomativa2:latest
-        
+
+      - name: Send Telegram's notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: "A implantação da aplicação foi concluída com sucesso!"
+
       - name: Print Finalizacao
         run: echo "Finalizado com sucesso!"
