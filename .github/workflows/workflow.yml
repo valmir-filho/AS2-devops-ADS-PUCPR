@@ -1,0 +1,51 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+  test-job:
+    needs: [build-job]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Executar análise de segurança estática
+        uses: AppThreat/sast-scan-action@master
+        with:
+          target: index.html, script.js, style.css
+          report_type: summary
+          severities: high, medium
+        env:
+          RISK_LEVEL: '10'
+
+  deploy-job:
+    needs: [test-job]
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+    steps:
+      - name: Checkout do repositorio
+        uses: actions/checkout@v2
+      - name: Build and Push Docker image
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          docker build -t atividadesomativa2:latest .
+          docker tag atividadesomativa2 vmcfilho/atividadesomativa2:latest
+          docker login --username vmcfilho --password $DOCKER_PASSWORD docker.io
+          docker push vmcfilho/atividadesomativa2:latest
+        
+      - name: Print Finalizacao
+        run: echo "Finalizado com sucesso!"
