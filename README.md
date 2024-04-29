@@ -4,4 +4,4 @@
 
 - AS2 da disciplina de DevOps do curso de Tecnologia em Análise e Desenvolvimento de Sistemas da PUCPR.
 
-### IDEs utilizadas: GitLab e Visual Studio Code.
+### IDE utilizada: Visual Studio Code.
